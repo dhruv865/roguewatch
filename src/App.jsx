@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
   LineChart,
@@ -17,12 +18,39 @@ const initialData = [
   { time: "10:25", power: 120 },
 ];
 
+const initialDevices = [
+  {
+    id: "FAN_204",
+    status: "Threat",
+    score: 92,
+    power: 120,
+  },
+  {
+    id: "AC_102",
+    status: "Warning",
+    score: 68,
+    power: 88,
+  },
+  {
+    id: "LIGHT_88",
+    status: "Healthy",
+    score: 12,
+    power: 40,
+  },
+  {
+    id: "TV_401",
+    status: "Healthy",
+    score: 8,
+    power: 55,
+  },
+];
+
 function App() {
-    const [data, setData] = useState(initialData);
+  const [data, setData] = useState(initialData);
+  const [devices, setDevices] = useState(initialDevices);
 
   useEffect(() => {
     const interval = setInterval(() => {
-
       setData((prev) => {
         const lastPower = prev[prev.length - 1].power;
 
@@ -32,31 +60,53 @@ function App() {
         const newPower =
           Math.max(50, lastPower + randomChange);
 
-        const next = [
+        return [
           ...prev.slice(1),
           {
             time: new Date().toLocaleTimeString(),
             power: newPower,
           },
         ];
-
-        return next;
       });
 
+      setDevices((prev) =>
+        prev.map((device) => {
+          const randomScore =
+            Math.floor(Math.random() * 100);
+
+          let status = "Healthy";
+
+          if (randomScore > 80) {
+            status = "Threat";
+          } else if (randomScore > 50) {
+            status = "Warning";
+          }
+
+          return {
+            ...device,
+            score: randomScore,
+            status,
+            power: Math.floor(Math.random() * 140),
+          };
+        })
+      );
     }, 2000);
 
     return () => clearInterval(interval);
   }, []);
+
   return (
     <div className="min-h-screen bg-[#0B1120] text-white flex">
 
       {/* Sidebar */}
       <div className="w-64 bg-[#111827] p-6 border-r border-gray-800">
+
         <h1 className="text-2xl font-bold mb-10 text-cyan-400">
           GhostDevice
         </h1>
 
         <div className="space-y-4">
+
           <div className="p-3 rounded-lg bg-cyan-500/20 text-cyan-300">
             Dashboard
           </div>
@@ -76,6 +126,7 @@ function App() {
           <div className="p-3 rounded-lg hover:bg-gray-800 cursor-pointer">
             Alerts
           </div>
+
         </div>
       </div>
 
@@ -84,6 +135,7 @@ function App() {
 
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
+
           <div>
             <h2 className="text-3xl font-bold">
               Smart Appliance Intelligence
@@ -97,6 +149,7 @@ function App() {
           <button className="bg-red-500 hover:bg-red-600 px-5 py-3 rounded-xl font-semibold">
             Inject Rogue Device
           </button>
+
         </div>
 
         {/* Stats */}
@@ -124,18 +177,89 @@ function App() {
 
         </div>
 
+        {/* AI Device Monitoring */}
+        <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800 mb-8">
+
+          <h2 className="text-2xl font-bold mb-6">
+            AI Device Monitoring
+          </h2>
+
+          <div className="overflow-hidden rounded-xl">
+
+            <table className="w-full">
+
+              <thead className="bg-gray-900">
+                <tr>
+                  <th className="text-left p-4">Device</th>
+                  <th className="text-left p-4">Threat Status</th>
+                  <th className="text-left p-4">AI Score</th>
+                  <th className="text-left p-4">Power Usage</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {devices.map((device, index) => (
+
+                  <tr
+                    key={index}
+                    className="border-t border-gray-800"
+                  >
+
+                    <td className="p-4">{device.id}</td>
+
+                    <td className="p-4">
+
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm ${
+                          device.status === "Threat"
+                            ? "bg-red-500/20 text-red-400"
+                            : device.status === "Warning"
+                            ? "bg-yellow-500/20 text-yellow-400"
+                            : "bg-green-500/20 text-green-400"
+                        }`}
+                      >
+                        {device.status}
+                      </span>
+
+                    </td>
+
+                    <td className="p-4">
+                      {device.score}%
+                    </td>
+
+                    <td className="p-4">
+                      {device.power}W
+                    </td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
         {/* Bottom Section */}
         <div className="grid grid-cols-2 gap-6">
 
           {/* Chart */}
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
+
             <h2 className="text-2xl font-bold mb-6">
               Live Power Usage
             </h2>
 
             <div className="h-72">
+
               <ResponsiveContainer width="100%" height="100%">
+
                 <LineChart data={data}>
+
                   <XAxis dataKey="time" stroke="#9CA3AF" />
                   <YAxis stroke="#9CA3AF" />
                   <Tooltip />
@@ -146,13 +270,18 @@ function App() {
                     stroke="#06B6D4"
                     strokeWidth={3}
                   />
+
                 </LineChart>
+
               </ResponsiveContainer>
+
             </div>
+
           </div>
 
           {/* Threat Feed */}
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
+
             <h2 className="text-2xl font-bold mb-6">
               Live Threat Feed
             </h2>
@@ -172,13 +301,17 @@ function App() {
               </div>
 
             </div>
+
           </div>
 
         </div>
 
       </div>
+
     </div>
   );
 }
 
 export default App;
+
+
