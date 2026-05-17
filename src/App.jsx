@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -8,145 +8,85 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const initialData = [
-  { time: "10:00", power: 72 },
-  { time: "10:05", power: 75 },
-  { time: "10:10", power: 70 },
-  { time: "10:15", power: 82 },
-  { time: "10:20", power: 78 },
-  { time: "10:25", power: 120 },
+const progressData = [
+  { quarter: "Q1", progress: 65 },
+  { quarter: "Q2", progress: 78 },
+  { quarter: "Q3", progress: 88 },
+  { quarter: "Q4", progress: 95 },
 ];
 
-const initialDevices = [
+const initialGoals = [
   {
-    id: "FAN_204",
-    status: "Threat",
-    score: 92,
-    power: 120,
+    title: "Increase Sales Revenue",
+    weightage: 25,
+    uom: "%",
+    status: "On Track",
+    progress: 72,
   },
   {
-    id: "AC_102",
-    status: "Warning",
-    score: 68,
-    power: 88,
+    title: "Reduce Customer Complaints",
+    weightage: 20,
+    uom: "Numeric",
+    status: "Completed",
+    progress: 100,
   },
   {
-    id: "LIGHT_88",
-    status: "Healthy",
-    score: 12,
-    power: 40,
+    title: "Improve Delivery Timeline",
+    weightage: 15,
+    uom: "Timeline",
+    status: "On Track",
+    progress: 64,
   },
   {
-    id: "TV_401",
-    status: "Healthy",
-    score: 8,
-    power: 55,
+    title: "Zero Safety Incidents",
+    weightage: 40,
+    uom: "Zero",
+    status: "Completed",
+    progress: 100,
   },
 ];
 
 function App() {
 
-  const [data, setData] = useState(initialData);
+  const [goals, setGoals] = useState(initialGoals);
 
-  const [devices, setDevices] =
-    useState(initialDevices);
-
-  const [alerts, setAlerts] = useState([
-    "⚠️ FAN_204 showing abnormal telemetry deviation",
-    "⚡ Voltage fluctuation detected in AC_102",
-    "🧠 AI behavioral fingerprint baseline updated",
+  const [checkins, setCheckins] = useState([
+    "Q1 goals reviewed by Manager",
+    "Marketing KPI approved",
+    "Sales target updated for Q2",
   ]);
 
-  useEffect(() => {
+  const createGoal = () => {
 
-    const interval = setInterval(() => {
+    const newGoal = {
+      title: "New Strategic Goal",
+      weightage: 10,
+      uom: "%",
+      status: "Not Started",
+      progress: 0,
+    };
 
-      setData((prev) => {
+    if (goals.length >= 8) {
+      alert("Maximum 8 goals allowed");
+      return;
+    }
 
-        const lastPower =
-          prev[prev.length - 1].power;
+    const totalWeightage =
+      goals.reduce(
+        (sum, goal) => sum + goal.weightage,
+        0
+      ) + newGoal.weightage;
 
-        const randomChange =
-          Math.floor(Math.random() * 30) - 10;
+    if (totalWeightage > 100) {
+      alert("Total weightage cannot exceed 100%");
+      return;
+    }
 
-        const newPower =
-          Math.max(50, lastPower + randomChange);
+    setGoals([...goals, newGoal]);
 
-        return [
-          ...prev.slice(1),
-          {
-            time: new Date().toLocaleTimeString(),
-            power: newPower,
-          },
-        ];
-      });
-
-      setDevices((prev) =>
-        prev.map((device) => {
-
-          const randomScore =
-            Math.floor(Math.random() * 100);
-
-          let status = "Healthy";
-
-          if (randomScore > 80) {
-            status = "Threat";
-          } else if (randomScore > 50) {
-            status = "Warning";
-          }
-
-          return {
-            ...device,
-            score: randomScore,
-            status,
-            power:
-              Math.floor(Math.random() * 140),
-          };
-        })
-      );
-
-    }, 2000);
-
-    return () => clearInterval(interval);
-
-  }, []);
-
-  const injectThreat = () => {
-
-    const randomIndex =
-      Math.floor(Math.random() * devices.length);
-
-    const attackedDevice =
-      devices[randomIndex].id;
-
-    setDevices((prev) =>
-      prev.map((device, index) => {
-
-        if (index === randomIndex) {
-
-          return {
-            ...device,
-            status: "Threat",
-            score: 99,
-            power: 220,
-          };
-        }
-
-        return device;
-      })
-    );
-
-    setAlerts((prev) => [
-      `🚨 Rogue activity detected in ${attackedDevice}`,
-      ...prev,
-    ]);
-
-    setData((prev) => [
-      ...prev.slice(1),
-      {
-        time: new Date().toLocaleTimeString(),
-        power: 250,
-      },
+    setCheckins([
+      "New goal submitted for approval",
+      ...checkins,
     ]);
   };
 
@@ -158,7 +98,7 @@ function App() {
       <div className="w-64 bg-[#111827] p-6 border-r border-gray-800">
 
         <h1 className="text-2xl font-bold mb-10 text-cyan-400">
-          GhostDevice
+          GoalSync AI
         </h1>
 
         <div className="space-y-4">
@@ -168,11 +108,11 @@ function App() {
           </div>
 
           <div className="p-3 rounded-lg hover:bg-gray-800 cursor-pointer">
-            Devices
+            My Goals
           </div>
 
           <div className="p-3 rounded-lg hover:bg-gray-800 cursor-pointer">
-            Threat Monitor
+            Team Reviews
           </div>
 
           <div className="p-3 rounded-lg hover:bg-gray-800 cursor-pointer">
@@ -180,7 +120,7 @@ function App() {
           </div>
 
           <div className="p-3 rounded-lg hover:bg-gray-800 cursor-pointer">
-            Alerts
+            Admin Panel
           </div>
 
         </div>
@@ -196,78 +136,87 @@ function App() {
           <div>
 
             <h2 className="text-3xl font-bold">
-              Smart Appliance Intelligence
+              Goal Setting & Tracking Portal
             </h2>
 
             <p className="text-gray-400 mt-2">
-              AI-powered rogue device detection system
+              AI-powered employee performance tracking system
             </p>
 
           </div>
 
           <button
-            onClick={injectThreat}
-            className="bg-red-500 hover:bg-red-600 px-5 py-3 rounded-xl font-semibold"
+            onClick={createGoal}
+            className="bg-cyan-500 hover:bg-cyan-600 px-5 py-3 rounded-xl font-semibold"
           >
-            Inject Rogue Device
+            Create Goal
           </button>
 
         </div>
 
-        {/* Stats */}
+        {/* Dashboard Cards */}
         <div className="grid grid-cols-4 gap-6 mb-8">
 
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
+
             <h3 className="text-gray-400">
-              Connected Devices
+              Total Goals
             </h3>
 
             <p className="text-4xl font-bold mt-3 text-cyan-400">
-              48
+              {goals.length}
             </p>
+
           </div>
 
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
+
             <h3 className="text-gray-400">
-              Threat Alerts
+              Pending Approvals
             </h3>
 
-            <p className="text-4xl font-bold mt-3 text-red-400">
-              {alerts.length}
+            <p className="text-4xl font-bold mt-3 text-yellow-400">
+              3
             </p>
+
           </div>
 
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
+
             <h3 className="text-gray-400">
-              Healthy Devices
+              Completed Goals
             </h3>
 
             <p className="text-4xl font-bold mt-3 text-green-400">
               {
-                devices.filter(
-                  (d) => d.status === "Healthy"
+                goals.filter(
+                  (goal) =>
+                    goal.status === "Completed"
                 ).length
               }
             </p>
+
           </div>
 
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
+
             <h3 className="text-gray-400">
-              AI Accuracy
+              Completion Rate
             </h3>
 
-            <p className="text-4xl font-bold mt-3 text-yellow-400">
-              98%
+            <p className="text-4xl font-bold mt-3 text-cyan-300">
+              92%
             </p>
+
           </div>
 
         </div>
 
-        {/* AI Device Monitoring */}
+        {/* Goal Tracking Table */}
         <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800 mb-8">
 
           <h2 className="text-2xl font-bold mb-6">
-            AI Device Monitoring
+            Employee Goal Tracking
           </h2>
 
           <div className="overflow-hidden rounded-xl">
@@ -277,28 +226,34 @@ function App() {
               <thead className="bg-gray-900">
 
                 <tr>
+
                   <th className="text-left p-4">
-                    Device
+                    Goal Title
                   </th>
 
                   <th className="text-left p-4">
-                    Threat Status
+                    Weightage
                   </th>
 
                   <th className="text-left p-4">
-                    AI Score
+                    UoM
                   </th>
 
                   <th className="text-left p-4">
-                    Power Usage
+                    Status
                   </th>
+
+                  <th className="text-left p-4">
+                    Progress
+                  </th>
+
                 </tr>
 
               </thead>
 
               <tbody>
 
-                {devices.map((device, index) => (
+                {goals.map((goal, index) => (
 
                   <tr
                     key={index}
@@ -306,31 +261,35 @@ function App() {
                   >
 
                     <td className="p-4">
-                      {device.id}
+                      {goal.title}
+                    </td>
+
+                    <td className="p-4">
+                      {goal.weightage}%
+                    </td>
+
+                    <td className="p-4">
+                      {goal.uom}
                     </td>
 
                     <td className="p-4">
 
                       <span
                         className={`px-3 py-1 rounded-full text-sm ${
-                          device.status === "Threat"
-                            ? "bg-red-500/20 text-red-400"
-                            : device.status === "Warning"
+                          goal.status === "Completed"
+                            ? "bg-green-500/20 text-green-400"
+                            : goal.status === "On Track"
                             ? "bg-yellow-500/20 text-yellow-400"
-                            : "bg-green-500/20 text-green-400"
+                            : "bg-red-500/20 text-red-400"
                         }`}
                       >
-                        {device.status}
+                        {goal.status}
                       </span>
 
                     </td>
 
                     <td className="p-4">
-                      {device.score}%
-                    </td>
-
-                    <td className="p-4">
-                      {device.power}W
+                      {goal.progress}%
                     </td>
 
                   </tr>
@@ -348,21 +307,21 @@ function App() {
         {/* Bottom Section */}
         <div className="grid grid-cols-2 gap-6">
 
-          {/* Chart */}
+          {/* Analytics Chart */}
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
 
             <h2 className="text-2xl font-bold mb-6">
-              Live Power Usage
+              Quarterly Goal Progress
             </h2>
 
             <div className="h-72">
 
               <ResponsiveContainer width="100%" height="100%">
 
-                <LineChart data={data}>
+                <LineChart data={progressData}>
 
                   <XAxis
-                    dataKey="time"
+                    dataKey="quarter"
                     stroke="#9CA3AF"
                   />
 
@@ -372,7 +331,7 @@ function App() {
 
                   <Line
                     type="monotone"
-                    dataKey="power"
+                    dataKey="progress"
                     stroke="#06B6D4"
                     strokeWidth={3}
                   />
@@ -385,22 +344,22 @@ function App() {
 
           </div>
 
-          {/* Threat Feed */}
+          {/* Manager Check-ins */}
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
 
             <h2 className="text-2xl font-bold mb-6">
-              Live Threat Feed
+              Manager Check-ins
             </h2>
 
             <div className="space-y-4">
 
-              {alerts.map((alert, index) => (
+              {checkins.map((item, index) => (
 
                 <div
                   key={index}
-                  className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl"
+                  className="bg-cyan-500/10 border border-cyan-500/30 p-4 rounded-xl"
                 >
-                  {alert}
+                  {item}
                 </div>
 
               ))}
@@ -418,5 +377,3 @@ function App() {
 }
 
 export default App;
-
-
