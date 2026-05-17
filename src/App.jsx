@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   LineChart,
@@ -46,13 +45,26 @@ const initialDevices = [
 ];
 
 function App() {
+
   const [data, setData] = useState(initialData);
-  const [devices, setDevices] = useState(initialDevices);
+
+  const [devices, setDevices] =
+    useState(initialDevices);
+
+  const [alerts, setAlerts] = useState([
+    "⚠️ FAN_204 showing abnormal telemetry deviation",
+    "⚡ Voltage fluctuation detected in AC_102",
+    "🧠 AI behavioral fingerprint baseline updated",
+  ]);
 
   useEffect(() => {
+
     const interval = setInterval(() => {
+
       setData((prev) => {
-        const lastPower = prev[prev.length - 1].power;
+
+        const lastPower =
+          prev[prev.length - 1].power;
 
         const randomChange =
           Math.floor(Math.random() * 30) - 10;
@@ -71,6 +83,7 @@ function App() {
 
       setDevices((prev) =>
         prev.map((device) => {
+
           const randomScore =
             Math.floor(Math.random() * 100);
 
@@ -86,16 +99,59 @@ function App() {
             ...device,
             score: randomScore,
             status,
-            power: Math.floor(Math.random() * 140),
+            power:
+              Math.floor(Math.random() * 140),
           };
         })
       );
+
     }, 2000);
 
     return () => clearInterval(interval);
+
   }, []);
 
+  const injectThreat = () => {
+
+    const randomIndex =
+      Math.floor(Math.random() * devices.length);
+
+    const attackedDevice =
+      devices[randomIndex].id;
+
+    setDevices((prev) =>
+      prev.map((device, index) => {
+
+        if (index === randomIndex) {
+
+          return {
+            ...device,
+            status: "Threat",
+            score: 99,
+            power: 220,
+          };
+        }
+
+        return device;
+      })
+    );
+
+    setAlerts((prev) => [
+      `🚨 Rogue activity detected in ${attackedDevice}`,
+      ...prev,
+    ]);
+
+    setData((prev) => [
+      ...prev.slice(1),
+      {
+        time: new Date().toLocaleTimeString(),
+        power: 250,
+      },
+    ]);
+  };
+
   return (
+
     <div className="min-h-screen bg-[#0B1120] text-white flex">
 
       {/* Sidebar */}
@@ -128,6 +184,7 @@ function App() {
           </div>
 
         </div>
+
       </div>
 
       {/* Main Content */}
@@ -137,6 +194,7 @@ function App() {
         <div className="flex justify-between items-center mb-8">
 
           <div>
+
             <h2 className="text-3xl font-bold">
               Smart Appliance Intelligence
             </h2>
@@ -144,9 +202,13 @@ function App() {
             <p className="text-gray-400 mt-2">
               AI-powered rogue device detection system
             </p>
+
           </div>
 
-          <button className="bg-red-500 hover:bg-red-600 px-5 py-3 rounded-xl font-semibold">
+          <button
+            onClick={injectThreat}
+            className="bg-red-500 hover:bg-red-600 px-5 py-3 rounded-xl font-semibold"
+          >
             Inject Rogue Device
           </button>
 
@@ -156,23 +218,47 @@ function App() {
         <div className="grid grid-cols-4 gap-6 mb-8">
 
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
-            <h3 className="text-gray-400">Connected Devices</h3>
-            <p className="text-4xl font-bold mt-3 text-cyan-400">48</p>
+            <h3 className="text-gray-400">
+              Connected Devices
+            </h3>
+
+            <p className="text-4xl font-bold mt-3 text-cyan-400">
+              48
+            </p>
           </div>
 
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
-            <h3 className="text-gray-400">Threat Alerts</h3>
-            <p className="text-4xl font-bold mt-3 text-red-400">3</p>
+            <h3 className="text-gray-400">
+              Threat Alerts
+            </h3>
+
+            <p className="text-4xl font-bold mt-3 text-red-400">
+              {alerts.length}
+            </p>
           </div>
 
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
-            <h3 className="text-gray-400">Healthy Devices</h3>
-            <p className="text-4xl font-bold mt-3 text-green-400">45</p>
+            <h3 className="text-gray-400">
+              Healthy Devices
+            </h3>
+
+            <p className="text-4xl font-bold mt-3 text-green-400">
+              {
+                devices.filter(
+                  (d) => d.status === "Healthy"
+                ).length
+              }
+            </p>
           </div>
 
           <div className="bg-[#111827] p-6 rounded-2xl border border-gray-800">
-            <h3 className="text-gray-400">AI Accuracy</h3>
-            <p className="text-4xl font-bold mt-3 text-yellow-400">98%</p>
+            <h3 className="text-gray-400">
+              AI Accuracy
+            </h3>
+
+            <p className="text-4xl font-bold mt-3 text-yellow-400">
+              98%
+            </p>
           </div>
 
         </div>
@@ -189,12 +275,25 @@ function App() {
             <table className="w-full">
 
               <thead className="bg-gray-900">
+
                 <tr>
-                  <th className="text-left p-4">Device</th>
-                  <th className="text-left p-4">Threat Status</th>
-                  <th className="text-left p-4">AI Score</th>
-                  <th className="text-left p-4">Power Usage</th>
+                  <th className="text-left p-4">
+                    Device
+                  </th>
+
+                  <th className="text-left p-4">
+                    Threat Status
+                  </th>
+
+                  <th className="text-left p-4">
+                    AI Score
+                  </th>
+
+                  <th className="text-left p-4">
+                    Power Usage
+                  </th>
                 </tr>
+
               </thead>
 
               <tbody>
@@ -206,7 +305,9 @@ function App() {
                     className="border-t border-gray-800"
                   >
 
-                    <td className="p-4">{device.id}</td>
+                    <td className="p-4">
+                      {device.id}
+                    </td>
 
                     <td className="p-4">
 
@@ -260,8 +361,13 @@ function App() {
 
                 <LineChart data={data}>
 
-                  <XAxis dataKey="time" stroke="#9CA3AF" />
+                  <XAxis
+                    dataKey="time"
+                    stroke="#9CA3AF"
+                  />
+
                   <YAxis stroke="#9CA3AF" />
+
                   <Tooltip />
 
                   <Line
@@ -288,17 +394,16 @@ function App() {
 
             <div className="space-y-4">
 
-              <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl">
-                ⚠️ FAN_204 showing abnormal telemetry deviation
-              </div>
+              {alerts.map((alert, index) => (
 
-              <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-xl">
-                ⚡ Voltage fluctuation detected in AC_102
-              </div>
+                <div
+                  key={index}
+                  className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl"
+                >
+                  {alert}
+                </div>
 
-              <div className="bg-cyan-500/10 border border-cyan-500/30 p-4 rounded-xl">
-                🧠 AI behavioral fingerprint baseline updated
-              </div>
+              ))}
 
             </div>
 
