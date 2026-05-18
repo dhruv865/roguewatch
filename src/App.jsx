@@ -60,7 +60,7 @@ function App() {
 
     const newGoal = {
       title: "New Strategic Goal",
-      weightage: 10,
+      weightage: 0,
       uom: "%",
       status: "Not Started",
       progress: 0,
@@ -149,7 +149,7 @@ function App() {
             onClick={createGoal}
             className="bg-cyan-500 hover:bg-cyan-600 px-5 py-3 rounded-xl font-semibold"
           >
-            Create Goal
+            Add Demo Goal
           </button>
 
         </div>
